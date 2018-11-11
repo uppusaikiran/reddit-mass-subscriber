@@ -1,36 +1,41 @@
 #!/usr/bin/python
+'''Reddit mass subscriber'''
 
 import time
-import traceback
+from sys import argv
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
+# Check if proper params are passed
+if len(argv) != 5:
+    print("Command:python app.py <path to chromedriver> <username> <password> <path to reddit.txt>")
+else:
+    PATH_DRIVER = argv[1]
+    USER_NAME = argv[2]
+    PASSWORD = argv[3]
+    PATH_FILE = argv[4]
+    DRIVER = webdriver.Chrome(PATH_DRIVER)
 
-driver = webdriver.Chrome('C:\\Users\\nsadmin\\Desktop\\chromedriver')
+    """
+    Reddit Login Information
+    """
+    DRIVER.get("https://old.reddit.com/")
+    ELEM = DRIVER.find_element_by_name("user")
+    ELEM.send_keys(USER_NAME)
+    ELEM = DRIVER.find_element_by_name("passwd")
+    ELEM.send_keys(PASSWORD)
+    ELEM.send_keys("\n")
+    time.sleep(5)
+    time.sleep(10)
 
-"""
-Reddit Login Information
-"""
-username = '<USERNAME>'
-password = '<PASSWORD>'
-driver.get("https://old.reddit.com/")
-elem = driver.find_element_by_name("user")
-elem.send_keys(username)
-elem = driver.find_element_by_name("passwd")
-elem.send_keys(password)
-elem.send_keys("\n")
-time.sleep(5)
-time.sleep(10)
-
-with open('reddit.txt','r') as f:
-    for line in f:
-        try:
-            driver.get(line.rstrip())
-            elem  = driver.find_element_by_link_text('subscribe')
-            elem.click()
-            time.sleep(5)
-        except Exception as e:
-            print '{}'.format(line.rstrip())
-            print e
-driver.delete_all_cookies()
-driver.close()
+    with open(PATH_FILE, 'r') as f:
+        for line in f:
+            try:
+                DRIVER.get(line.rstrip())
+                ELEM = DRIVER.find_element_by_link_text('subscribe')
+                ELEM.click()
+                time.sleep(5)
+            except Exception as err:
+                print('{}'.format(line.rstrip()))
+                print(err)
+    DRIVER.delete_all_cookies()
+    DRIVER.close()
